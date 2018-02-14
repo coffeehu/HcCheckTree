@@ -447,7 +447,7 @@ HcCheckTree.prototype._expandLi = function(li,arrow){
 		}
 	}
 }
-// 收尾操作，此时 dom 已渲染完毕，监听事件设置完成。
+// 收尾操作，此时 dom 已渲染完毕，监听事件已设置完成。
 // 如若是设置了 checked:true 则选中对应dom
 HcCheckTree.prototype._initEnds = function(){
 	//-------获得要选中的<li>------
@@ -565,8 +565,14 @@ HcCheckTree.prototype.addChild = function(parentLi,name){
 	//DOM添加
 	//构建要添加的<li>
 	var li = document.createElement('li');
+	var checkboxClass = '';
+	if(parentLi && parentLi.hcData.checked){
+		checkboxClass = 'hc-checkbox hc-checked';
+	}else{
+		checkboxClass = 'hc-checkbox';
+	}
 	var html = '<div class="hc-arrow"></div>'+
-		'<div class="hc-checkbox"></div>'+
+		'<div class="'+checkboxClass+'"></div>'+
 		'<label class="hc-label">'+name+'</label>';
 	li.innerHTML = html;
 
@@ -597,6 +603,9 @@ HcCheckTree.prototype.addChild = function(parentLi,name){
 		elem:li,
 		parent:parentLi.hcData
 	};
+	if(parentLi && parentLi.hcData.checked){
+		obj.checked = parentLi.hcData.checked;
+	}
 	li.hcData = obj;
 	parentLi.hcData.children.push(obj);
 }
