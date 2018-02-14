@@ -1,0 +1,83 @@
+ul.hc-checktree *{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+ul.hc-checktree{
+	width: 100%;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+ul.hc-checktree > li{
+	width: 100%;
+	min-height: 30px;
+	line-height: 30px;
+}
+ul.hc-checktree > li > ul{
+	margin-left: 20px;
+}
+
+/*#############按钮与选择框#############*/
+ul.hc-checktree div.hc-checkbox,
+ul.hc-checktree div.hc-arrow{
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	margin-right: 4px;
+	vertical-align: middle;
+	cursor: pointer;
+}
+/*------按钮-------*/
+ul.hc-checktree div.hc-arrow{
+	cursor: auto;
+}
+/*按钮：折叠*/
+ul.hc-checktree div.hc-collapsed{
+	background:url('../imgs/checktree_icon.png');
+	background-position: 0px -22px;
+	cursor: pointer;
+}
+/*按钮：展开*/
+ul.hc-checktree div.hc-expanded{
+	background:url('../imgs/checktree_icon.png');
+	background-position: -14px -22px;
+	cursor: pointer;
+}
+/*-------选择框---------*/
+ul.hc-checktree div.hc-checkbox{
+	background:url('../imgs/checktree_icon.png');
+	background-position: 0 -4px;
+}
+/*选择框：选中*/
+ul.hc-checktree div.hc-checked{
+	background:url('../imgs/checktree_icon.png');
+	background-position: 32px -4px;
+}
+/*选择框：半选中*/
+ul.hc-checktree div.hc-checked-half{
+	background:url('../imgs/checktree_icon.png');
+	background-position: 15px -4px;
+}
+/*------名称-------*/
+ul.hc-checktree label.hc-label{
+	display: inline-block;
+	vertical-align: middle;
+	-moz-user-select:none;/*火狐*/
+	-webkit-user-select:none;/*webkit浏览器*/
+	-ms-user-select:none;/*IE10*/
+	-khtml-user-select:none;/*早期浏览器*/
+	user-select:none;
+	cursor: pointer;
+}
+/*#############显示与隐藏#############*/
+ul.hc-checktree ul.hc-hide{
+	display: none;
+}
+ul.hc-checktree .hc-hide{
+	display: none!important;
+}
+ul.hc-checktree ul.hc-show{
+	display: block;
+}

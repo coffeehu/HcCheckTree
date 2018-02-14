@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="./css/hcCheckTree.css">
+	<style type="text/css">
+		.tree-container{
+			position: absolute;
+			left: 20%;
+			top: 10%;
+			border: 1px solid #000;
+			min-height: 400px;
+			width: 200px;
+		}
+		.mbtn{
+			position: absolute;
+			bottom: 10%;
+			left: 20%;
+			width: 100px;
+			height: 30px;
+			background-color: gray;
+		}
+		.mbtn2{
+			bottom: 5%;
+		}
+		.test4,
+		.test2{
+			left: 60%;
+		}
+	</style>
+</head>
+<body>
+	<div class="tree-container" id="tree-container"></div>
+
+	<div class="mbtn">折叠</div>
+	<div class="mbtn test2">获得选中</div>
+	<div class="mbtn mbtn2">全选</div>
+	<div class="mbtn mbtn2 test4">test4</div>
+
+<script src="./js/test.js"></script>
+<script type="text/javascript">
+	var data = [
+		{
+			name:'行政部',
+			children:[]
+		},
+		{
+			name:'技术部',
+			expanded:true,
+			children:[
+				{
+					name:'前端开发',
+					checked:true,
+					//expanded:true,
+					children:[
+						{
+							name:'vue.js',
+							//checked:true	
+						},
+						{
+							name:'node.js'
+						}
+					]
+				},
+				{
+					name:'后台开发'
+				}
+			]
+		},
+		{
+			name:'商务部',
+			checked:true,
+			children:[
+				{
+					name:'电商平台部',
+					//expanded:true
+				},
+				{
+					name:'海外事业部'
+				}
+			]
+		}
+	];
+
+	var hcTree = new HcCheckTree({
+		id:'tree-container',
+		data:data,
+		//checkbox:false,
+		clickFn:function(event,params){
+			console.log('click',params);
+			//this.addChild(params.elem,'test')
+			//this.remove(params.elem)
+		},
+		checkFn:function(params){
+			console.log('check it!',params)
+		}
+	});
+
+	var test = document.getElementsByClassName('mbtn')[0];
+	var test2 = document.getElementsByClassName('mbtn')[1];
+	var test3 = document.getElementsByClassName('mbtn2')[0];
+	var test4 = document.getElementsByClassName('mbtn2')[1];
+	test.onclick = function(){
+		var text = this.textContent;
+		if(text === '折叠'){
+			hcTree.collapseAll();
+			this.textContent = '展开';
+		}else if(text === '展开'){
+			hcTree.expandAll();
+			this.textContent = '折叠';
+		}
+	}
+	test2.onclick = function(){
+		console.log(hcTree.getAllChecks());
+	}
+	test3.onclick = function(){
+		var text = this.textContent;
+		if(text === '全选'){
+			hcTree.checkAll();
+			this.textContent = '取消选中';
+		}else if(text === '取消选中'){
+			hcTree.cancelAll();
+			this.textContent = '全选';
+		}
+	}
+	test4.onclick = function(){
+		//hcTree.cancelAll()
+		//hcTree.cancelAll()
+	}
+
+</script>
+</body>
+</html>
