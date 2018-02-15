@@ -1,4 +1,5 @@
 /*
+	hucong 2018-02-14
 	带勾选框的树形目录
 
 	默认全部折叠，未选中。默认显示勾选框。
@@ -126,13 +127,13 @@ var HcCheckTree = exports.HcCheckTree = function(option){
 	option = option || {};
 	
 	this._initOption(option);
-	this._initData();
+	this._initData(option.data);
 	this._preCheckedArr = [];
 	
 	this.container = document.getElementById(option.id);
 	if(this.container){
 		this.container.innerHTML = '';
-		this._createHTML(this.container,option.data);
+		this._createHTML(this.container,this.data);
 		this._initEvents();
 		this.root = domUtil.children(this.container)[0]; //根<ul>元素
 		this._initEnds(); // 一些收尾的操作，如若是设置了expanded:true则展开对应dom
@@ -144,7 +145,7 @@ var HcCheckTree = exports.HcCheckTree = function(option){
 HcCheckTree.prototype._initOption = function(option){
 	if(!option.id) throw new Erorr('element id error!');
 	this.id = option.id || '';
-	this.data = option.data || [];
+	option.data = option.data || [];
 	// 默认是有勾选框的
 	if(option.checkbox === undefined){
 		this.checkbox = true;	
@@ -155,7 +156,7 @@ HcCheckTree.prototype._initOption = function(option){
 	this.checkFn = option.checkFn || function(){};
 	this.cancelFn = option.cancelFn || function(){};
 }
-// 处理data数据
+// 复制并处理data数据
 /*
 	目的：当数据含有 expanded 属性时，如：
 	[
@@ -172,7 +173,7 @@ HcCheckTree.prototype._initOption = function(option){
 		{...}
 	]
 	表明“前端”这一级要展开。那么自然“技术部”这一级也应该展开。
-	因此要将数据遍历成为如下：
+	源数据将会复制并处理成如下格式：
 	[
 		{
 			name:'技术部',
@@ -195,9 +196,10 @@ HcCheckTree.prototype._initOption = function(option){
 	]
 	可见其父级也应该多一个属性 expanded:true
 */
-HcCheckTree.prototype._initData = function(){
+HcCheckTree.prototype._initData = function(data){
+	this.data = [];
 	var expandedArr = [];
-	createExpandedArr(this.data);
+	createExpandedArr(data,this.data);
 	// 将对象以及其父对象都添加 expanded:true 属性
 	for(var i=0,l=expandedArr.length;i<l;i++){
 		var item = expandedArr[i];
@@ -207,21 +209,27 @@ HcCheckTree.prototype._initData = function(){
 	}
 	// 先找出含有 expanded:true 属性的对象，放入数组。
 	//若一个树有多个expanded属性，那么取最近的（最父级的）一个
-	function createExpandedArr(arr,parent){
+	function createExpandedArr(arr,copyArr,parent){
 		for(var i=0,l=arr.length;i<l;i++){
-			var item = arr[i];
-			item.parent = parent;
-			item.checked = item.checked||false;
-			item.expanded = item.expanded||false;
-			if(item.expanded){
-				if(parent && parent.expanded){
+			var node = arr[i];
+			var obj = {};
+			for(var p in node){
+				obj[p] = node[p];
+			}
+			obj.parent = parent;
+			obj.checked = node.checked||false;
+			obj.expanded = node.expanded||false;
+			copyArr.push(obj);
+			if(obj.expanded){
+				if(parent && parent.expanded){ // 若其父级已是展开状态，那么不做处理
 
-				}else{ // 若是当前条目有属性 expanded:true，那么其子条目的 expanded 属性就会被忽略
-					expandedArr.push(item);
+				}else{ // 加入展开数组
+					expandedArr.push(obj);
 				}
 			}
-			if(item.children && item.children.length>0){
-				createExpandedArr(item.children,item);
+			if(obj.children && obj.children.length>0){
+				obj.children = [];
+				createExpandedArr(node.children,obj.children,obj);
 			}
 		}
 	}
@@ -287,7 +295,6 @@ HcCheckTree.prototype._initEvents = function(){
 	this.container.onclick = function(event){
 		var target = event.target;
 		var className = event.target.className;
-		if(className.indexOf('hc-nochildren') !== -1) return;
 
 		// arrow 展开/收起按钮 
 		if(className.indexOf('hc-arrow') !== -1){
@@ -435,13 +442,15 @@ HcCheckTree.prototype._expandLi = function(li,arrow){
 	li.hcData.expanded = true;
 
 	arrow = arrow || domUtil.children(li)[0];
-	arrow.className = 'hc-arrow hc-expanded';
+	arrow.className = 'hc-arrow';
 	
 	if(li.isUpdated){ // 已渲染过，直接修改display展开
+		arrow.className = 'hc-arrow hc-expanded';
 		var ul = domUtil.children(li,'ul')[0];
 		ul.className = 'hc-checktree';
 	}else{ //未渲染过，需根据数据生成dom
 		if(li.hcData.children && li.hcData.children.length>0){
+			arrow.className = 'hc-arrow hc-expanded';
 			this._createHTML(li,li.hcData.children,li.hcData.checked);
 			li.isUpdated = true;
 		}
@@ -633,6 +642,7 @@ HcCheckTree.prototype.remove = function(li){
 		}
 	}
 }
+
 
 
 }(typeof exports === 'object' ? exports : window));

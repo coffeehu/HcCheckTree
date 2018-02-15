@@ -55,6 +55,7 @@
 					children:[
 						{
 							name:'vue.js',
+							//expanded:true
 							//checked:true	
 						},
 						{
@@ -82,13 +83,30 @@
 		}
 	];
 
+
+
+
+	function jsonAdapter(json,name,childrenName){
+		var mJson = '';
+		if(name){
+			mJson = JSON.parse( JSON.stringify(json).replace(/name/g,name) );
+		}
+		if(childrenName){
+			mJson = JSON.parse( JSON.stringify(json).replace(/children/g,childrenName) );
+		}
+		return mJson;
+	}
+
+
+
 	var hcTree = new HcCheckTree({
 		id:'tree-container',
 		data:data,
+		//cName:'deptList',
 		//checkbox:false,
 		clickFn:function(event,params){
-			//console.log('click',params);
-			this.addChild(params.elem,'test')
+			console.log('click',params);
+			//this.addChild(params.elem,'test')
 			//this.remove(params.elem)
 		},
 		checkFn:function(params){
@@ -127,6 +145,8 @@
 		//hcTree.cancelAll()
 		//hcTree.cancelAll()
 	}
+
+	console.log('data----',data)
 
 </script>
 </body>
