@@ -52,6 +52,8 @@
 */
 (function(exports){
 
+var hcLabelName = 'name';
+var cName = 'children';
 
 var domUtil = {
 	children:function(elem,tagName){
@@ -104,9 +106,9 @@ var domUtil = {
 		var childrenLiList = domUtil.children(ul,'li')||null;
 		return childrenLiList;*/
 		var childrenLiList = [];
-		if(li.hcData.children && li.hcData.children.length>0){
-			for(var i=0,l=li.hcData.children.length;i<l;i++){
-				var childLi = li.hcData.children[i].elem;
+		if(li.hcData[cName] && li.hcData[cName].length>0){
+			for(var i=0,l=li.hcData[cName].length;i<l;i++){
+				var childLi = li.hcData[cName][i].elem;
 				if(childLi) childrenLiList.push(childLi);
 			}
 		}
@@ -145,6 +147,8 @@ var HcCheckTree = exports.HcCheckTree = function(option){
 HcCheckTree.prototype._initOption = function(option){
 	if(!option.id) throw new Erorr('element id error!');
 	this.id = option.id || '';
+	hcLabelName = option.name || 'name';
+	cName = option.cName || 'children';
 	option.data = option.data || [];
 	// 默认是有勾选框的
 	if(option.checkbox === undefined){
@@ -227,9 +231,9 @@ HcCheckTree.prototype._initData = function(data){
 					expandedArr.push(obj);
 				}
 			}
-			if(obj.children && obj.children.length>0){
-				obj.children = [];
-				createExpandedArr(node.children,obj.children,obj);
+			if(obj[cName] && obj[cName].length>0){
+				obj[cName] = [];
+				createExpandedArr(node[cName],obj[cName],obj);
 			}
 		}
 	}
@@ -253,7 +257,7 @@ HcCheckTree.prototype._createHTML = function(container,data,checked){
 		}
 
 		// 展开、折叠箭头的样式
-		if(node.children && node.children.length>0){
+		if(node[cName] && node[cName].length>0){
 			if(li.hcData.expanded){
 				arrowClass = 'hc-expanded';
 			}else{
@@ -277,7 +281,7 @@ HcCheckTree.prototype._createHTML = function(container,data,checked){
 
 		var html = '<div class="hc-arrow '+arrowClass+'"></div>'+
 			'<div class="'+checkboxClass+'"></div>'+
-			'<label class="hc-label">'+node.name+'</label>';
+			'<label class="hc-label">'+node[hcLabelName]+'</label>';
 		li.innerHTML = html;
 
 		if(li.hcData.expanded){ //若初始设置为展开
@@ -362,9 +366,9 @@ HcCheckTree.prototype._checkboxLinkDown = function(target,check){
 		this._checkboxLinkDown(childrenCheckbox,check);
 	}
 	//数据处理
-	if(li.hcData.children && li.hcData.children.length>0){
-		for(var j=0,len=li.hcData.children.length;j<len;j++){
-			li.hcData.children[j].checked = check;
+	if(li.hcData[cName] && li.hcData[cName].length>0){
+		for(var j=0,len=li.hcData[cName].length;j<len;j++){
+			li.hcData[cName][j].checked = check;
 		}
 	}
 }
@@ -449,9 +453,9 @@ HcCheckTree.prototype._expandLi = function(li,arrow){
 		var ul = domUtil.children(li,'ul')[0];
 		ul.className = 'hc-checktree';
 	}else{ //未渲染过，需根据数据生成dom
-		if(li.hcData.children && li.hcData.children.length>0){
+		if(li.hcData[cName] && li.hcData[cName].length>0){
 			arrow.className = 'hc-arrow hc-expanded';
-			this._createHTML(li,li.hcData.children,li.hcData.checked);
+			this._createHTML(li,li.hcData[cName],li.hcData.checked);
 			li.isUpdated = true;
 		}
 	}
@@ -489,8 +493,8 @@ HcCheckTree.prototype.getAllChecks = function(){
 				var obj = li.hcData;
 				var childUl = domUtil.children(li,'ul')[0];
 				if(childUl){
-					obj.children = [];
-					createCheckObj(childUl,obj.children);
+					obj[cName] = [];
+					createCheckObj(childUl,obj[cName]);
 				}
 				collection.push(obj);
 			}else if(className.indexOf('hc-checked') !== -1){ //选中
@@ -529,7 +533,7 @@ HcCheckTree.prototype.expandAll = function(){
 	function expandByLiList(liList){
 		for(var i=0,l=liList.length;i<l;i++){
 			var li = liList[i];
-			if(li.hcData.children && li.hcData.children.length>0){
+			if(li.hcData[cName] && li.hcData[cName].length>0){
 				if(!li.hcData.expanded){ // 未展开状态
 					self._expandLi(li);
 				}
@@ -553,7 +557,7 @@ HcCheckTree.prototype.collapseAll = function(){
 		if(!liList) return;
 		for(var i=0,l=liList.length;i<l;i++){
 			var li = liList[i];
-			if(li.hcData.children && li.hcData.children.length>0){
+			if(li.hcData[cName] && li.hcData[cName].length>0){
 				if(li.hcData.expanded){ // 未展开状态
 					self._collapseLi(li);
 				}
@@ -585,13 +589,13 @@ HcCheckTree.prototype.addChild = function(parentLi,name){
 		'<label class="hc-label">'+name+'</label>';
 	li.innerHTML = html;
 
-	if(parentLi.hcData.children && parentLi.hcData.children.length>0){ //若已有子条目
+	if(parentLi.hcData[cName] && parentLi.hcData[cName].length>0){ //若已有子条目
 		var ul = domUtil.children(parentLi,'ul')[0];
 		if(ul){
 			ul.appendChild(li);
 		}
 	}else{ //无子条目
-		parentLi.hcData.children = [];
+		parentLi.hcData[cName] = [];
 
 		var arrow = domUtil.getArrowByLi(parentLi);
 		arrow.className = 'hc-arrow hc-expanded';
@@ -616,7 +620,7 @@ HcCheckTree.prototype.addChild = function(parentLi,name){
 		obj.checked = parentLi.hcData.checked;
 	}
 	li.hcData = obj;
-	parentLi.hcData.children.push(obj);
+	parentLi.hcData[cName].push(obj);
 }
 // 删除条目
 HcCheckTree.prototype.remove = function(li){
@@ -626,7 +630,7 @@ HcCheckTree.prototype.remove = function(li){
 	//数据处理
 	var parentLi = domUtil.getParentLi(li);
 	if(parentLi){
-		var children = parentLi.hcData.children;
+		var children = parentLi.hcData[cName];
 		var index = 0;
 		for(var i=0,l=children.length;i<l;i++){
 			var node = children[i];
