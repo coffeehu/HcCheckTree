@@ -150,6 +150,7 @@ HcCheckTree.prototype._initOption = function(option){
 	hcLabelName = option.name || 'name';
 	cName = option.cName || 'children';
 	option.data = option.data || [];
+	this.icon = option.icon;
 	// 默认是有勾选框的
 	if(option.checkbox === undefined){
 		this.checkbox = true;	
@@ -223,6 +224,12 @@ HcCheckTree.prototype._initData = function(data){
 			obj.parent = parent;
 			obj.checked = node.checked||false;
 			obj.expanded = node.expanded||false;
+			if(parent){
+				if(parent.childIcon){
+					obj.icon = parent.childIcon;
+					obj.childIcon = parent.childIcon;
+				}
+			}
 			copyArr.push(obj);
 			if(obj.expanded){
 				if(parent && parent.expanded){ // 若其父级已是展开状态，那么不做处理
@@ -279,8 +286,16 @@ HcCheckTree.prototype._createHTML = function(container,data,checked){
 			checkboxClass = 'hc-checkbox hc-hide';
 		}
 
+		// 所有图标
+		var iconHtml = this.icon? '<img class="hc-icon" src="'+this.icon+'">' : '';
+
+		if(node.icon){
+			iconHtml = '<img class="hc-icon" src="'+node.icon+'">';
+		}
+
 		var html = '<div class="hc-arrow '+arrowClass+'"></div>'+
 			'<div class="'+checkboxClass+'"></div>'+
+			iconHtml+
 			'<label class="hc-label">'+node[hcLabelName]+'</label>';
 		li.innerHTML = html;
 
@@ -380,6 +395,7 @@ HcCheckTree.prototype._checkboxLinkUp = function(target){
 
 	var parentCheckbox = domUtil.getCheckboxByLi(parentLi);
 	if(parentCheckbox === null) return;
+	
 	var liList = domUtil.getChildrenLiList(parentLi);  //获得同级的<li>
 	if(liList === null) return;
 	var checkboxes = []; //获得同级<li>的checkbox元素，放入数组
@@ -584,8 +600,14 @@ HcCheckTree.prototype.addChild = function(parentLi,name){
 	}else{
 		checkboxClass = 'hc-checkbox';
 	}
+	var iconHtml = this.icon? '<img class="hc-icon" src="'+this.icon+'">' : '';
+	if(parent&&parent.childIcon){
+		iconHtml = '<img class="hc-icon" src="'+parent.childIcon+'">';
+	}
+
 	var html = '<div class="hc-arrow"></div>'+
 		'<div class="'+checkboxClass+'"></div>'+
+		iconHtml+
 		'<label class="hc-label">'+name+'</label>';
 	li.innerHTML = html;
 
@@ -618,6 +640,10 @@ HcCheckTree.prototype.addChild = function(parentLi,name){
 	};
 	if(parentLi && parentLi.hcData.checked){
 		obj.checked = parentLi.hcData.checked;
+	}
+	if(parent&&parent.childIcon){
+		obj.childIcon = parent.childIcon;
+		obj.icon = parent.childIcon;
 	}
 	li.hcData = obj;
 	parentLi.hcData[cName].push(obj);
