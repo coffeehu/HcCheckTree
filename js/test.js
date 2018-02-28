@@ -224,6 +224,7 @@ HcCheckTree.prototype._initOption = function(option){
 	cName = option.cName || 'children';
 	option.data = option.data || [];
 	this.icon = option.icon;
+	this.ricon = option.ricon;
 	// 默认是有勾选框的
 	if(option.checkbox === undefined){
 		this.checkbox = true;	
@@ -233,6 +234,8 @@ HcCheckTree.prototype._initOption = function(option){
 	this.clickFn = option.clickFn || function(){};
 	this.checkFn = option.checkFn || function(){};
 	this.cancelFn = option.cancelFn || function(){};
+	this.iconClickFn = option.iconClickFn || function(){};
+	this.riconClickFn = option.riconClickFn || function(){};
 }
 // 复制并处理data数据
 /*
@@ -297,6 +300,7 @@ HcCheckTree.prototype._initData = function(data){
 			obj.parent = parent;
 			obj.checked = node.checked||false;
 			obj.expanded = node.expanded||false;
+			// 图标
 			if(parent){
 				if(parent.childIcon){
 					obj.childIcon = parent.childIcon;
@@ -304,6 +308,16 @@ HcCheckTree.prototype._initData = function(data){
 						obj.icon = node.icon;
 					}else{
 						obj.icon = parent.childIcon;
+					}
+				}
+
+				//右图标
+				if(parent.childRicon){
+					obj.childRicon = parent.childRicon;
+					if(node.ricon){ 
+						obj.ricon = node.ricon;
+					}else{
+						obj.ricon = parent.childRicon;
 					}
 				}
 			}
@@ -365,15 +379,22 @@ HcCheckTree.prototype._createHTML = function(container,data,checked){
 
 		// 图标（作用于所有）
 		var iconHtml = this.icon? '<img class="hc-icon" src="'+this.icon+'">' : '';
-
 		if(node.icon){
 			iconHtml = '<img class="hc-icon" src="'+node.icon+'">';
 		}
 
+		// 右图标
+		var riconHtml = this.ricon? '<img class="hc-ricon" src="'+this.ricon+'">' : '';
+		if(node.ricon){
+			riconHtml = '<img class="hc-ricon" src="'+node.ricon+'">';
+		}
+
+
 		var html = '<div class="hc-arrow '+arrowClass+'"></div>'+
 			'<div class="'+checkboxClass+'"></div>'+
 			iconHtml+
-			'<label class="hc-label">'+node[hcLabelName]+'</label>';
+			'<label class="hc-label">'+node[hcLabelName]+'</label>'+
+			riconHtml;
 		li.innerHTML = html;
 
 		if(li.hcData.expanded){ //若初始设置为展开
@@ -426,6 +447,22 @@ HcCheckTree.prototype._initEvents = function(){
 			var li = domUtil.getLi(target);
 			if(li !== null){
 				self.clickFn(event,li.hcData);
+			}
+		}
+
+		// icon 的点击事件
+		else if( domUtil.hasClass(target,'hc-icon') ){
+			var li = domUtil.getLi(target);
+			if(li !== null){
+				self.iconClickFn(li.hcData);
+			}
+		}
+
+		// ricon（右图标）的点击事件
+		else if( domUtil.hasClass(target,'hc-ricon') ){
+			var li = domUtil.getLi(target);
+			if(li !== null){
+				self.riconClickFn(li.hcData);
 			}
 		}
 
@@ -698,11 +735,17 @@ HcCheckTree.prototype.addChild = function(parentLi,name){
 	if(parentLi&&parentLi.hcData.childIcon){
 		iconHtml = '<img class="hc-icon" src="'+parentLi.hcData.childIcon+'">';
 	}
+	// 右图标样式
+	var riconHtml = this.ricon? '<img class="hc-ricon" src="'+this.ricon+'">' : '';
+	if(parentLi&&parentLi.hcData.childRicon){
+		riconHtml = '<img class="hc-ricon" src="'+parentLi.hcData.childRicon+'">';
+	}
 
 	var html = '<div class="hc-arrow"></div>'+
 		'<div class="'+checkboxClass+'"></div>'+
 		iconHtml+
-		'<label class="hc-label">'+name+'</label>';
+		'<label class="hc-label">'+name+'</label>'+
+		riconHtml;
 	li.innerHTML = html;
 
 	if(parentLi.hcData[cName] && parentLi.hcData[cName].length>0){ //若已有子条目
@@ -739,6 +782,10 @@ HcCheckTree.prototype.addChild = function(parentLi,name){
 	if(parent&&parent.childIcon){
 		obj.childIcon = parent.childIcon;
 		obj.icon = parent.childIcon;
+		if(parent.childRicon){
+			obj.childRicon = parent.childRicon;
+			obj.icon = parent.childRicon;
+		}
 	}
 	li.hcData = obj;
 	parentLi.hcData[cName].push(obj);

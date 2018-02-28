@@ -22,13 +22,18 @@ ul.hc-checktree > li > ul{
 /*#############按钮与选择框#############*/
 ul.hc-checktree div.hc-checkbox,
 ul.hc-checktree div.hc-arrow,
-ul.hc-checktree img.hc-icon{
+ul.hc-checktree img.hc-icon,
+ul.hc-checktree img.hc-ricon{
 	display: inline-block;
 	width: 14px;
 	height: 14px;
 	margin-right: 4px;
 	vertical-align: middle;
 	cursor: pointer;
+}
+ul.hc-checktree img.hc-ricon{
+	margin-right: 0;
+	margin-left: 4px;
 }
 /*------按钮-------*/
 ul.hc-checktree div.hc-arrow{
