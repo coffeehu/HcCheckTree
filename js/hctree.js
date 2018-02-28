@@ -25,7 +25,7 @@
 		}
 	];
 
-	var hcTree = new HcCheckTree({
+	var hcTree = new Hctree({
 		id:'tree-container',  //容器元素的id
 		data:data,  // 数据结构见上
 		//checkbox:false,  // false可关闭勾选框
@@ -197,7 +197,7 @@ var domUtil = {
 	}
 };
 
-var HcCheckTree = exports.HcCheckTree = function(option){
+var Hctree = exports.Hctree = function(option){
 	if(typeof option !== 'object') return;
 	option = option || {};
 	
@@ -217,7 +217,7 @@ var HcCheckTree = exports.HcCheckTree = function(option){
 	}
 }
 
-HcCheckTree.prototype._initOption = function(option){
+Hctree.prototype._initOption = function(option){
 	if(!option.id) throw new Erorr('element id error!');
 	this.id = option.id || '';
 	hcLabelName = option.name || 'name';
@@ -277,7 +277,7 @@ HcCheckTree.prototype._initOption = function(option){
 	]
 	可见其父级也应该多一个属性 expanded:true
 */
-HcCheckTree.prototype._initData = function(data){
+Hctree.prototype._initData = function(data){
 	this.data = [];
 	var expandedArr = [];
 	createExpandedArr(data,this.data);
@@ -339,7 +339,7 @@ HcCheckTree.prototype._initData = function(data){
 
 // 根据data（数组形式），渲染html结生成：<ul></ul>,并将其追加到container里
 // checked:boolean值，true表示设为选中
-HcCheckTree.prototype._createHTML = function(container,data,checked){
+Hctree.prototype._createHTML = function(container,data,checked){
 	var ul = document.createElement('ul');
 	ul.className = 'hc-checktree';
 	var arrowClass,checkboxClass;
@@ -407,7 +407,7 @@ HcCheckTree.prototype._createHTML = function(container,data,checked){
 }
 
 //初始化点击事件
-HcCheckTree.prototype._initEvents = function(){
+Hctree.prototype._initEvents = function(){
 	var self = this;
 	this.container.onclick = function(event){
 		var target = event.target;
@@ -472,13 +472,13 @@ HcCheckTree.prototype._initEvents = function(){
 //选中选择框后，其子选择框、父选择框的联动响应
 // check: true-选中，false-取消
 // target:checkbox元素
-HcCheckTree.prototype._checkboxLink = function(target,check){
+Hctree.prototype._checkboxLink = function(target,check){
 	this._checkboxLinkDown(target,check);
 	this._checkboxLinkUp(target);
 }
 //对其子选择框的联动
 //check: true-选中，false-取消
-HcCheckTree.prototype._checkboxLinkDown = function(target,check){
+Hctree.prototype._checkboxLinkDown = function(target,check){
 	//本 checkbox 的样式
 	if(check){
 		domUtil.addClass(target,'hc-checked');
@@ -509,7 +509,7 @@ HcCheckTree.prototype._checkboxLinkDown = function(target,check){
 	}
 }
 //对其父选择框的联动
-HcCheckTree.prototype._checkboxLinkUp = function(target){
+Hctree.prototype._checkboxLinkUp = function(target){
 	var li = domUtil.getLi(target);
 	var parentLi = domUtil.getParentLi(li);
 	if(parentLi === null) return;
@@ -542,7 +542,7 @@ HcCheckTree.prototype._checkboxLinkUp = function(target){
 }
 // 返回勾选框的状态
 // return: 0-全未选，1-部分选，2-全选; -1-报错
-HcCheckTree.prototype._checkboxesStatus = function(checkboxes){
+Hctree.prototype._checkboxesStatus = function(checkboxes){
 	var total = checkboxes.length;
 	var num = 0, //选中的checkbox的数量
 		num2 = 0; // 半选的（half check）checkbox的数量
@@ -570,7 +570,7 @@ HcCheckTree.prototype._checkboxesStatus = function(checkboxes){
 	return -1;
 }
 // 折叠<li>
-HcCheckTree.prototype._collapseLi = function(li,arrow){
+Hctree.prototype._collapseLi = function(li,arrow){
 	li.hcData.expanded = false;
 	arrow = arrow || domUtil.children(li)[0];
 
@@ -581,7 +581,7 @@ HcCheckTree.prototype._collapseLi = function(li,arrow){
 	domUtil.addClass(ul,'hc-hide');
 }
 // 展开<li>
-HcCheckTree.prototype._expandLi = function(li,arrow){
+Hctree.prototype._expandLi = function(li,arrow){
 	li.hcData.expanded = true;
 
 	arrow = arrow || domUtil.children(li)[0];
@@ -600,7 +600,7 @@ HcCheckTree.prototype._expandLi = function(li,arrow){
 }
 // 收尾操作，此时 dom 已渲染完毕，监听事件已设置完成。
 // 如若是设置了 checked:true 则选中对应dom
-HcCheckTree.prototype._initEnds = function(){
+Hctree.prototype._initEnds = function(){
 	//-------获得要选中的<li>------
 	for(var i=0,l=this._preCheckedArr.length;i<l;i++){
 		var li = this._preCheckedArr[i];
@@ -614,7 +614,7 @@ HcCheckTree.prototype._initEnds = function(){
 }
 
 // 获得当前选中的集合，数组形式
-HcCheckTree.prototype.getAllChecks = function(){
+Hctree.prototype.getAllChecks = function(){
 	var collection = [];
 	createCheckObj(this.root,collection);
 
@@ -644,7 +644,7 @@ HcCheckTree.prototype.getAllChecks = function(){
 	return collection;
 }
 //全选
-HcCheckTree.prototype.checkAll = function(){
+Hctree.prototype.checkAll = function(){
 	var checkboxes = this.root.getElementsByClassName('hc-checkbox');
 	for(var i=0;i<checkboxes.length;i++){
 		domUtil.removeClass(checkboxes[i],'hc-checked-half');
@@ -654,7 +654,7 @@ HcCheckTree.prototype.checkAll = function(){
 	}
 }
 //取消全部
-HcCheckTree.prototype.cancelAll = function(){
+Hctree.prototype.cancelAll = function(){
 	var checkboxes = this.root.getElementsByClassName('hc-checkbox');
 	for(var i=0;i<checkboxes.length;i++){
 		domUtil.removeClass(checkboxes[i],'hc-checked hc-checked-half');
@@ -663,7 +663,7 @@ HcCheckTree.prototype.cancelAll = function(){
 	}
 }
 // 展开全部
-HcCheckTree.prototype.expandAll = function(){
+Hctree.prototype.expandAll = function(){
 	var self = this;
 	var liList = domUtil.children(this.root,'li');
 	expandByLiList(liList);
@@ -686,7 +686,7 @@ HcCheckTree.prototype.expandAll = function(){
 	}
 }
 // 折叠全部
-HcCheckTree.prototype.collapseAll = function(){
+Hctree.prototype.collapseAll = function(){
 	var self = this;
 	var liList = domUtil.children(this.root,'li');
 	collapseByLiList(liList);
@@ -710,7 +710,7 @@ HcCheckTree.prototype.collapseAll = function(){
 	}
 }
 // 添加子条目
-HcCheckTree.prototype.addChild = function(parentLi,name){
+Hctree.prototype.addChild = function(parentLi,name){
 	this._expandLi(parentLi); //首先展开当前的父<li>
 
 	//DOM添加
@@ -791,7 +791,7 @@ HcCheckTree.prototype.addChild = function(parentLi,name){
 	parentLi.hcData[cName].push(obj);
 }
 // 删除条目
-HcCheckTree.prototype.remove = function(li){
+Hctree.prototype.remove = function(li){
 	// DOM移除
 	li.parentNode.removeChild(li);
 
