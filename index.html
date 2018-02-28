@@ -46,17 +46,18 @@
 		},
 		{
 			name:'技术部',
-			expanded:true,
-			icon:'./imgs/folder.png',
+			//expanded:true,
+			//icon:'./imgs/asterisk.png',
 			//childIcon:'./imgs/asterisk.png',
 			children:[
 				{
 					name:'前端开发',
-					checked:true,
+					//checked:true,
 					//expanded:true,
 					children:[
 						{
 							name:'vue.js',
+							//icon:'./imgs/folder.png',
 							//expanded:true
 							//checked:true	
 						},
@@ -72,7 +73,7 @@
 		},
 		{
 			name:'商务部',
-			checked:true,
+			//checked:true,
 			children:[
 				{
 					name:'电商平台部',
@@ -88,7 +89,7 @@
 	//var data = [{"id":"6151d4333e384f5da8125481ee4d4909","label":"研发部","parentId":"0","treeLevel":"0","seq":1,"note":null,"operator":"admin","operateIp":"127.0.0.1","operateTime":1515600000000,"status":1,"deptList":[{"id":"c7b1c8a05cfb4b02a17db57a18b40258","label":"前端开发","parentId":"6151d4333e384f5da8125481ee4d4909","treeLevel":"0.1","seq":1,"note":null,"operator":"admin","operateIp":"127.0.0.1","operateTime":1515600000000,"status":1,"deptList":[]},{"id":"fad11f4749d14caeb1eb7f282d3e42a6","label":"后端开发","parentId":"6151d4333e384f5da8125481ee4d4909","treeLevel":"0.1","seq":2,"note":null,"operator":"admin","operateIp":"127.0.0.1","operateTime":1515600000000,"status":1,"deptList":[]}]},{"id":"4ebc3a4cdc314593808c4f69fc3d756a","label":"測試1","parentId":"0","treeLevel":"0","seq":1,"note":null,"operator":"admin","operateIp":"127.0.0.1","operateTime":1515600000000,"status":1,"deptList":[]},{"id":"b82900ddda0d46deace800b9b280df4a","label":"行政部","parentId":"0","treeLevel":"0","seq":2,"note":null,"operator":"admin","operateIp":"127.0.0.1","operateTime":1515600000000,"status":1,"deptList":[]}];
 
 
-	function jsonAdapter(json,name,childrenName){
+	/*function jsonAdapter(json,name,childrenName){
 		var mJson = '';
 		if(name){
 			mJson = JSON.parse( JSON.stringify(json).replace(/name/g,name) );
@@ -98,7 +99,7 @@
 		}
 		return mJson;
 	}
-
+*/
 
 
 	var hcTree = new HcCheckTree({
@@ -110,7 +111,7 @@
 		//checkbox:false,
 		clickFn:function(event,params){
 			console.log('click',params);
-			//this.addChild(params.elem,'test')
+			this.addChild(params.elem,'test')
 			//this.remove(params.elem)
 		},
 		checkFn:function(params){
@@ -146,7 +147,6 @@
 		}
 	}
 	test4.onclick = function(){
-		//hcTree.cancelAll()
 		//hcTree.cancelAll()
 	}
 

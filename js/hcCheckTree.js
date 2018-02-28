@@ -78,6 +78,79 @@ var domUtil = {
 		while( (el = el.nextSibling) && el.nodeType != 1 ){};
 		return el;
 	},
+	addClass:function(el,value){
+		var classes = this._classesToArray(value),
+		curValue,cur,j,clazz,finalValue;
+
+		if(classes.length>0){
+			curValue = el.getAttribute && el.getAttribute('class') || '';
+			cur = ' '+this._stripAndCollapse(curValue)+' ';
+
+			if(cur){
+				var j=0;
+				while( (clazz = classes[j++]) ){
+					if ( cur.indexOf( ' ' + clazz + ' ' ) < 0 ) {
+						cur += clazz + ' ';
+					}
+				}
+
+				finalValue = this._stripAndCollapse(cur);
+				if(curValue !== finalValue){
+					el.setAttribute('class',finalValue);
+				}
+			}
+		}
+	},
+	removeClass:function(el,value){
+		var classes = this._classesToArray(value),
+		curValue,cur,j,clazz,finalValue;
+
+		if(classes.length>0){
+			curValue = el.getAttribute && el.getAttribute('class') || '';
+			cur = ' '+this._stripAndCollapse(curValue)+' ';
+
+			if(cur){
+				var j=0;
+				while( (clazz = classes[j++]) ){
+					if ( cur.indexOf( ' ' + clazz + ' ' ) > -1 ) {
+						cur = cur.replace(' '+clazz+' ' ,' ');
+					}
+				}
+
+				finalValue = this._stripAndCollapse(cur);
+				if(curValue !== finalValue){
+					el.setAttribute('class',finalValue);
+				}
+			}
+		}
+	},
+	hasClass:function(el,value){
+		var className = ' '+value+' ';
+		var curValue = el.getAttribute && el.getAttribute('class') || '';
+		var cur = ' '+this._stripAndCollapse(curValue)+' ';
+
+		if(cur.indexOf(className) > -1){
+			return true;
+		}
+		return false;
+	},
+	_stripAndCollapse:function(value){
+		//var htmlwhite = ( /[^\x20\t\r\n\f]+/g );
+		var htmlwhite = ( /[^\s]+/g );
+		var arr = value.match(htmlwhite)||[];
+		return arr.join(' ');
+	},
+	_classesToArray:function(value){
+		if ( Array.isArray( value ) ) {
+			return value;
+		}
+		if ( typeof value === "string" ) {
+			//var htmlwhite = ( /[^\x20\t\r\n\f]+/g );
+			var htmlwhite = ( /[^\s]+/g );
+			return value.match( htmlwhite ) || [];
+		}
+		return [];
+	},
 	getLi:function(el){  // 根据展开折叠按钮、勾选框、名字获得对应的<li>
 		var p = el.parentNode;
 		if(p.tagName === 'LI'){
@@ -226,8 +299,12 @@ HcCheckTree.prototype._initData = function(data){
 			obj.expanded = node.expanded||false;
 			if(parent){
 				if(parent.childIcon){
-					obj.icon = parent.childIcon;
 					obj.childIcon = parent.childIcon;
+					if(node.icon){  // 若有 icon 字段，则优先该字段。否则使用 parent.childIcon
+						obj.icon = node.icon;
+					}else{
+						obj.icon = parent.childIcon;
+					}
 				}
 			}
 			copyArr.push(obj);
@@ -286,7 +363,7 @@ HcCheckTree.prototype._createHTML = function(container,data,checked){
 			checkboxClass = 'hc-checkbox hc-hide';
 		}
 
-		// 所有图标
+		// 图标（作用于所有）
 		var iconHtml = this.icon? '<img class="hc-icon" src="'+this.icon+'">' : '';
 
 		if(node.icon){
@@ -313,39 +390,39 @@ HcCheckTree.prototype._initEvents = function(){
 	var self = this;
 	this.container.onclick = function(event){
 		var target = event.target;
-		var className = event.target.className;
 
 		// arrow 展开/收起按钮 
-		if(className.indexOf('hc-arrow') !== -1){
+		if(domUtil.hasClass(target,'hc-arrow')){
 			var li = domUtil.getLi(target);
 			if(li !== null){
-				if(className.indexOf('hc-collapsed') !== -1){ //收起的，应置为展开
+				if(domUtil.hasClass(target,'hc-collapsed')){ //收起的，应置为展开
 					self._expandLi(li,target);
-				}else if(className.indexOf('hc-expanded') !== -1){ // 展开的，应收起
+				}else if(domUtil.hasClass(target,'hc-expanded')){ // 展开的，应收起
 					self._collapseLi(li,target);
 				}
 			}
 		}
 
 		// checkbox 选中按钮
-		else if(className.indexOf('hc-checkbox') !== -1){
+		else if( domUtil.hasClass(target,'hc-checkbox') ){
 			var li = domUtil.getLi(target);
 			if(li !== null){
-				if(className.indexOf('hc-checked') === -1){ //未选中，应置为选中
-					li.hcData.checked = true;
-					target.className = 'hc-checkbox hc-checked';
-					self._checkboxLink(target,true);
-				}else{ // 选中的，应置为未选中
+				if( domUtil.hasClass(target,'hc-checked') || domUtil.hasClass(target,'hc-checked-half') ){ // 选中的，应置为未选中
 					li.hcData.checked = false;
-					target.className = 'hc-checkbox';
+					domUtil.removeClass(target,'hc-checked hc-checked-half');
 					self._checkboxLink(target,false);
+				}else{ //未选中，应置为选中
+					li.hcData.checked = true;
+					domUtil.removeClass(target,'hc-checked-half');
+					domUtil.addClass(target,'hc-checked');
+					self._checkboxLink(target,true);
 				}
 				self.checkFn(li.hcData);
 			}
 		}
 
 		// label 名称的点击事件
-		else if(className.indexOf('hc-label') !== -1){
+		else if( domUtil.hasClass(target,'hc-label') ){
 			var li = domUtil.getLi(target);
 			if(li !== null){
 				self.clickFn(event,li.hcData);
@@ -366,8 +443,11 @@ HcCheckTree.prototype._checkboxLink = function(target,check){
 //check: true-选中，false-取消
 HcCheckTree.prototype._checkboxLinkDown = function(target,check){
 	//本 checkbox 的样式
-	var className = check?'hc-checkbox hc-checked':'hc-checkbox';
-	target.className = className;
+	if(check){
+		domUtil.addClass(target,'hc-checked');
+	}else{
+		domUtil.removeClass(target,'hc-checked hc-checked-half');
+	}
 
 	var li = domUtil.getLi(target);
 	var childrenLiList = domUtil.getChildrenLiList(li);
@@ -376,7 +456,11 @@ HcCheckTree.prototype._checkboxLinkDown = function(target,check){
 		var childrenLi = childrenLiList[i];
 		//子 checkbox 的样式
 		var childrenCheckbox = domUtil.getCheckboxByLi(childrenLi);
-		childrenCheckbox.className = className;
+		if(check){
+			domUtil.addClass(childrenCheckbox,'hc-checked');
+		}else{
+			domUtil.removeClass(childrenCheckbox,'hc-checked hc-checked-half');
+		}
 		//传入子 checkbox 递归
 		this._checkboxLinkDown(childrenCheckbox,check);
 	}
@@ -406,13 +490,15 @@ HcCheckTree.prototype._checkboxLinkUp = function(target){
 
 	var result = this._checkboxesStatus(checkboxes);
 	if(result === 0){ // 未选
-		parentCheckbox.className = 'hc-checkbox';
+		domUtil.removeClass(parentCheckbox,'hc-checked hc-checked-half');
 		if(li!==null) parentLi.hcData.checked = false;
 	}else if(result === 1){ //半选
-		parentCheckbox.className = 'hc-checkbox hc-checked-half';
+		domUtil.removeClass(parentCheckbox,'hc-checked');
+		domUtil.addClass(parentCheckbox,'hc-checked-half');
 		if(li!==null) parentLi.hcData.checked = true;
 	}else if(result === 2){ //已选
-		parentCheckbox.className = 'hc-checkbox hc-checked';
+		domUtil.removeClass(parentCheckbox,'hc-checked-half');
+		domUtil.addClass(parentCheckbox,'hc-checked');
 		if(li!==null) parentLi.hcData.checked = true;
 	}
 	this._checkboxLinkUp(parentCheckbox);
@@ -424,9 +510,8 @@ HcCheckTree.prototype._checkboxesStatus = function(checkboxes){
 	var num = 0, //选中的checkbox的数量
 		num2 = 0; // 半选的（half check）checkbox的数量
 	for(var i=0,l=total;i<l;i++){
-		var className = checkboxes[i].className;
-		if(className.indexOf('hc-checked-half') === -1 ){
-			if(className.indexOf('hc-checked') !== -1){
+		if( !domUtil.hasClass(checkboxes[i],'hc-checked-half') ){
+			if( domUtil.hasClass(checkboxes[i],'hc-checked') ){
 				num++;
 			}
 		}else{
@@ -452,25 +537,25 @@ HcCheckTree.prototype._collapseLi = function(li,arrow){
 	li.hcData.expanded = false;
 	arrow = arrow || domUtil.children(li)[0];
 
-	arrow.className = 'hc-arrow hc-collapsed';
+	domUtil.removeClass(arrow,'hc-expanded');
+	domUtil.addClass(arrow,'hc-collapsed');
 
 	var ul = domUtil.children(li,'ul')[0];
-	ul.className = 'hc-checktree hc-hide';
+	domUtil.addClass(ul,'hc-hide');
 }
 // 展开<li>
 HcCheckTree.prototype._expandLi = function(li,arrow){
 	li.hcData.expanded = true;
 
 	arrow = arrow || domUtil.children(li)[0];
-	arrow.className = 'hc-arrow';
+	domUtil.removeClass(arrow,'hc-collapsed');
+	domUtil.addClass(arrow,'hc-expanded');
 	
 	if(li.isUpdated){ // 已渲染过，直接修改display展开
-		arrow.className = 'hc-arrow hc-expanded';
 		var ul = domUtil.children(li,'ul')[0];
-		ul.className = 'hc-checktree';
+		domUtil.removeClass(ul,'hc-hide');
 	}else{ //未渲染过，需根据数据生成dom
 		if(li.hcData[cName] && li.hcData[cName].length>0){
-			arrow.className = 'hc-arrow hc-expanded';
 			this._createHTML(li,li.hcData[cName],li.hcData.checked);
 			li.isUpdated = true;
 		}
@@ -503,7 +588,7 @@ HcCheckTree.prototype.getAllChecks = function(){
 			var checkbox = domUtil.children(li)[1];
 			var className = checkbox.className;
 
-			if(className.indexOf('hc-checked-half') !== -1){ //半选状态
+			if( domUtil.hasClass(checkbox,'hc-checked-half') ){ //半选状态
 				var name = domUtil.children(li)[2].textContent;
 				//var obj = { name:name };
 				var obj = li.hcData;
@@ -513,10 +598,9 @@ HcCheckTree.prototype.getAllChecks = function(){
 					createCheckObj(childUl,obj[cName]);
 				}
 				collection.push(obj);
-			}else if(className.indexOf('hc-checked') !== -1){ //选中
+			}
+			if( domUtil.hasClass(checkbox,'hc-checked') ){ //选中
 				collection.push(li.hcData);
-			}else{ //未选中
-
 			}
 		}
 	}
@@ -526,7 +610,8 @@ HcCheckTree.prototype.getAllChecks = function(){
 HcCheckTree.prototype.checkAll = function(){
 	var checkboxes = this.root.getElementsByClassName('hc-checkbox');
 	for(var i=0;i<checkboxes.length;i++){
-		checkboxes[i].className = 'hc-checkbox hc-checked';
+		domUtil.removeClass(checkboxes[i],'hc-checked-half');
+		domUtil.addClass(checkboxes[i],'hc-checked');
 		var li = domUtil.getLi(checkboxes[i]);
 		li.hcData.checked = true;
 	}
@@ -535,7 +620,7 @@ HcCheckTree.prototype.checkAll = function(){
 HcCheckTree.prototype.cancelAll = function(){
 	var checkboxes = this.root.getElementsByClassName('hc-checkbox');
 	for(var i=0;i<checkboxes.length;i++){
-		checkboxes[i].className = 'hc-checkbox';
+		domUtil.removeClass(checkboxes[i],'hc-checked hc-checked-half');
 		var li = domUtil.getLi(checkboxes[i]);
 		li.hcData.checked = false;
 	}
@@ -594,15 +679,24 @@ HcCheckTree.prototype.addChild = function(parentLi,name){
 	//DOM添加
 	//构建要添加的<li>
 	var li = document.createElement('li');
+
+
+	// 勾选框的样式
 	var checkboxClass = '';
-	if(parentLi && parentLi.hcData.checked){
-		checkboxClass = 'hc-checkbox hc-checked';
+	if(this.checkbox){
+		if(parentLi && parentLi.hcData.checked){
+			checkboxClass = 'hc-checkbox hc-checked';
+		}else{
+			checkboxClass = 'hc-checkbox';
+		}
 	}else{
-		checkboxClass = 'hc-checkbox';
+		checkboxClass = 'hc-checkbox hc-hide';
 	}
+
+	// 图标样式
 	var iconHtml = this.icon? '<img class="hc-icon" src="'+this.icon+'">' : '';
-	if(parent&&parent.childIcon){
-		iconHtml = '<img class="hc-icon" src="'+parent.childIcon+'">';
+	if(parentLi&&parentLi.hcData.childIcon){
+		iconHtml = '<img class="hc-icon" src="'+parentLi.hcData.childIcon+'">';
 	}
 
 	var html = '<div class="hc-arrow"></div>'+
@@ -620,7 +714,8 @@ HcCheckTree.prototype.addChild = function(parentLi,name){
 		parentLi.hcData[cName] = [];
 
 		var arrow = domUtil.getArrowByLi(parentLi);
-		arrow.className = 'hc-arrow hc-expanded';
+		domUtil.addClass(arrow,'hc-expanded');
+		domUtil.removeClass(arrow,'hc-collapsed');
 
 		var ul = document.createElement('ul');
 		ul.className = 'hc-checktree';
