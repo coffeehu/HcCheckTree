@@ -12,8 +12,8 @@ ul.hc-checktree{
 
 ul.hc-checktree > li{
 	width: 100%;
-	min-height: 30px;
-	line-height: 30px;
+/*	min-height: 30px;
+	line-height: 30px;*/
 }
 ul.hc-checktree > li > ul{
 	margin-left: 20px;
