@@ -814,6 +814,13 @@ Hctree.prototype.remove = function(li){
 		}
 	}
 }
+Hctree.prototype.setData = function(data){
+	this._initData(data);
+	this._preCheckedArr = [];
+	this.container.innerHTML = '';
+	this._createHTML(this.container,this.data);
+	this._initEnds(); // 一些收尾的操作，如若是设置了expanded:true则展开对应dom
+}
 
 
 

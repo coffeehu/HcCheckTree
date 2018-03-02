@@ -117,7 +117,7 @@
 			//this.remove(params.elem)
 		},
 		checkFn:function(params){
-			console.log('check it!',params)
+			console.log('check it!',params,this)
 		},
 		iconClickFn:function(params){
 			console.log('click icon!',params);
@@ -156,6 +156,11 @@
 	}
 	test4.onclick = function(){
 		//hcTree.cancelAll()
+		var data = [
+			{name:'苹果'},
+			{name:'梨子'}
+		];
+		hcTree.setData(data);
 	}
 
 	console.log('data----',data)
