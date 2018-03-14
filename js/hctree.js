@@ -56,6 +56,21 @@ var hcLabelName = 'name';
 var cName = 'children';
 
 var domUtil = {
+	addcss:function(){
+		var id = 'hc-tree-css';
+		if(document.getElementById(id)) return;
+		var head = document.getElementsByTagName('head')[0];
+		var link = document.createElement('link');
+		var path = this.getPath();
+		link.rel = 'stylesheet';
+		link.href = path + '../css/hctree.css';
+		link.id = id;
+		head.appendChild(link);
+	},
+	getPath:function(){
+		var jsPath = document.currentScript.src;
+		return jsPath.substring(0,jsPath.lastIndexOf('/')+1);
+	},
 	children:function(elem,tagName){
 		if(elem === undefined) return;
 		var node = elem.firstChild;
@@ -196,6 +211,8 @@ var domUtil = {
 		return checkbox;
 	}
 };
+
+domUtil.addcss();
 
 var Hctree = exports.Hctree = function(option){
 	if(typeof option !== 'object') return;
