@@ -68,7 +68,19 @@ var domUtil = {
 		head.appendChild(link);
 	},
 	getPath:function(){
-		var jsPath = document.currentScript.src;
+		// IE9下，document.currentScript 为 null
+		var jsPath = document.currentScript ? document.currentScript.src : function(){
+			var js = document.scripts
+			,last = js.length - 1
+			,src;
+			for(var i = last; i > 0; i--){
+				if(js[i].readyState === 'interactive'){
+				  src = js[i].src;
+				  break;
+				}
+			}
+			return src || js[last].src;
+	    }();
 		return jsPath.substring(0,jsPath.lastIndexOf('/')+1);
 	},
 	children:function(elem,tagName){
@@ -253,6 +265,7 @@ Hctree.prototype._initOption = function(option){
 	this.cancelFn = option.cancelFn || function(){};
 	this.iconClickFn = option.iconClickFn || function(){};
 	this.riconClickFn = option.riconClickFn || function(){};
+	this.deep = option.deep;
 }
 // 复制并处理data数据
 /*
@@ -297,7 +310,13 @@ Hctree.prototype._initOption = function(option){
 Hctree.prototype._initData = function(data){
 	this.data = [];
 	var expandedArr = [];
-	createExpandedArr(data,this.data);
+	if(this.deep !== undefined && !this.deep){ // option 里设置了 deep:false
+		createExpandedArr2(data);
+		this.data = data;
+	}else{
+		createExpandedArr(data,this.data);
+	}
+	
 	// 将对象以及其父对象都添加 expanded:true 属性
 	for(var i=0,l=expandedArr.length;i<l;i++){
 		var item = expandedArr[i];
@@ -305,8 +324,12 @@ Hctree.prototype._initData = function(data){
 			item.expanded = true;
 		}
 	}
-	// 先找出含有 expanded:true 属性的对象，放入数组。
-	//若一个树有多个expanded属性，那么取最近的（最父级的）一个
+
+	/*
+		深复制源数据
+		先找出含有 expanded:true 属性的对象，放入数组。
+		若一个树有多个expanded属性，那么取最近的（最父级的）一个
+	*/
 	function createExpandedArr(arr,copyArr,parent){
 		for(var i=0,l=arr.length;i<l;i++){
 			var node = arr[i];
@@ -317,23 +340,25 @@ Hctree.prototype._initData = function(data){
 			obj.parent = parent;
 			obj.checked = node.checked||false;
 			obj.expanded = node.expanded||false;
+			//设置层级
+			if(parent === undefined){ 
+				obj.zIndex = 0;
+			}else{
+				obj.zIndex = parent.zIndex+1;
+			}
 			// 图标
 			if(parent){
-				if(parent.childIcon){
+				if(parent.childIcon !== undefined){
 					obj.childIcon = parent.childIcon;
-					if(node.icon){  // 若有 icon 字段，则优先该字段。否则使用 parent.childIcon
-						obj.icon = node.icon;
-					}else{
+					if(node.icon === undefined){  // 若无 icon 字段，则使用 parent.childIcon
 						obj.icon = parent.childIcon;
 					}
 				}
 
 				//右图标
-				if(parent.childRicon){
+				if(parent.childRicon !== undefined){
 					obj.childRicon = parent.childRicon;
-					if(node.ricon){ 
-						obj.ricon = node.ricon;
-					}else{
+					if(node.ricon === undefined){ 
 						obj.ricon = parent.childRicon;
 					}
 				}
@@ -352,6 +377,49 @@ Hctree.prototype._initData = function(data){
 			}
 		}
 	}
+
+	// 同上处理，但不复制源数据
+	function createExpandedArr2(arr,parent){
+		for(var i=0,l=arr.length;i<l;i++){
+			var node = arr[i];
+			node.parent = parent;
+			node.checked = node.checked||false;
+			node.expanded = node.expanded||false;
+			if(parent === undefined){
+				node.zIndex = 0;
+			}else{
+				node.zIndex = parent.zIndex+1;
+			}
+			// 图标
+			if(parent){
+				if(parent.childIcon !== undefined){
+					node.childIcon = parent.childIcon;
+					if(node.icon === undefined){  // 若无 icon 字段，则使用 parent.childIcon
+						node.icon = parent.childIcon;
+					}
+				}
+
+				//右图标
+				if(parent.childRicon !== undefined){
+					node.childRicon = parent.childRicon;
+					if(node.ricon === undefined){ 
+						node.ricon = parent.childRicon;
+					}
+				}
+			}
+			if(node.expanded){
+				if(parent && parent.expanded){ // 若其父级已是展开状态，那么不做处理
+
+				}else{ // 加入展开数组
+					expandedArr.push(node);
+				}
+			}
+			if(node[cName] && node[cName].length>0){
+				createExpandedArr2(node[cName],node);
+			}
+		}
+	}
+
 }
 
 // 根据data（数组形式），渲染html结生成：<ul></ul>,并将其追加到container里
@@ -394,18 +462,22 @@ Hctree.prototype._createHTML = function(container,data,checked){
 			checkboxClass = 'hc-checkbox hc-hide';
 		}
 
-		// 图标（作用于所有）
-		var iconHtml = this.icon? '<img class="hc-icon" src="'+this.icon+'">' : '';
-		if(node.icon){
-			iconHtml = '<img class="hc-icon" src="'+node.icon+'">';
+		// 左图标（option中设置的，全局，优先级小于单独设置的）
+		var iconHtml = '';
+		if(typeof this.icon === 'string'){
+			iconHtml = this.icon? '<img class="hc-icon" src="'+this.icon+'">' : '';
+		}else if(Array.isArray(this.icon)){
+			iconHtml = this.icon[node.zIndex]? '<img class="hc-icon" src="'+this.icon[node.zIndex]+'">' : '';
+		}
+		if(node.icon !== undefined){ // 若是node单独设置了icon
+			iconHtml = node.icon ? '<img class="hc-icon" src="'+node.icon+'">' : '';
 		}
 
-		// 右图标
+		// 右图标（option中设置的，全局，优先级小于单独设置的）
 		var riconHtml = this.ricon? '<img class="hc-ricon" src="'+this.ricon+'">' : '';
-		if(node.ricon){
-			riconHtml = '<img class="hc-ricon" src="'+node.ricon+'">';
+		if(node.ricon !== undefined){
+			riconHtml = node.ricon ? '<img class="hc-ricon" src="'+node.ricon+'">' : '';
 		}
-
 
 		var html = '<div class="hc-arrow '+arrowClass+'"></div>'+
 			'<div class="'+checkboxClass+'"></div>'+

@@ -27,7 +27,7 @@
 			left: 60%;
 		}
 	</style>
-	<script src="./js/test.js"></script>
+	<script src="./js/hctree.js"></script>
 </head>
 <body>
 	<div class="tree-container" id="tree-container"></div>
@@ -55,10 +55,12 @@
 					name:'前端开发',
 					//checked:true,
 					//expanded:true,
+					//icon:'./imgs/asterisk.png',
+					//childIcon:false,
 					children:[
 						{
 							name:'vue.js',
-							//icon:'./imgs/folder.png',
+							//icon:false,
 							//expanded:true
 							//checked:true	
 						},
@@ -106,7 +108,9 @@
 	var hcTree = new Hctree({
 		id:'tree-container',
 		data:data,
+		//deep:false,
 		//icon:'./imgs/folder.png',
+		icon:['./imgs/folder.png','./imgs/asterisk.png','./imgs/add.png'],
 		//ricon:'./imgs/folder.png',
 		//cName:'deptList',
 		//name:'label',
@@ -117,7 +121,7 @@
 			//this.remove(params.elem)
 		},
 		checkFn:function(params){
-			console.log('check it!',params,this)
+			console.log('check it!',params)
 		},
 		iconClickFn:function(params){
 			console.log('click icon!',params);
