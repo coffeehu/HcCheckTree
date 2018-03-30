@@ -82,7 +82,7 @@ var hcTree = new Hctree({
     ]
     }
 ```
-![image](http://note.youdao.com/favicon.ico)
+![image](https://github.com/coffeehu/hctree/blob/master/tmp/expand.png)
 
 ### 2、全部展开：expandAll()
 ```
