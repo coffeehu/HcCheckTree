@@ -88,6 +88,7 @@
 	</div>
 	
 <script type="text/javascript">
+
 	var data = [
 		{
 			name:'小吃',
@@ -95,24 +96,12 @@
 		},
 		{
 			name:'主食',
-			//expanded:true,
-			//icon:'./imgs/asterisk.png',
-			//childRicon:'./imgs/asterisk.png',
-			//ricon:'./imgs/asterisk.png',
 			children:[
 				{
 					name:'面食',
-					//checked:true,
-					//expanded:true,
-					//icon:false,
-					//childIcon:false,
-					//childIcon:false,
 					children:[
 						{
 							name:'豚骨拉面',
-							//icon:false,
-							//expanded:true
-							//checked:true	
 						},
 						{
 							name:'牛肉米粉'
@@ -126,11 +115,9 @@
 		},
 		{
 			name:'饮品',
-			//checked:true,
 			children:[
 				{
 					name:'咖啡',
-					//expanded:true
 				},
 				{
 					name:'杨枝甘露'
@@ -143,27 +130,14 @@
 	var hcTree = new Hctree({
 		id:'mtree',
 		data:data,
-		//deep:false,
-		//icon:'./imgs/folder.png',
-		//icon:['./imgs/folder.png','./imgs/star.png','./imgs/asterisk.png'],
-		//ricon:'./imgs/heart.png',
-		//ricon:['./imgs/heart.png','./imgs/del.png','./imgs/video.png'],
-		//cName:'deptList',
-		//name:'label',
-		//checkbox:false,
-		clickFn:function(event,params){
+		clickFn:function(params){
 			console.log('click',params);
-			//this.addChild(params.elem,'test')
-			//this.remove(params.elem)
 		},
 		checkFn:function(params){
 			console.log('check it!',params)
 		},
 		iconClickFn:function(params){
 			console.log('click icon!',params);
-		},
-		riconClickFn:function(params){
-			console.log('click right icon!',params);
 		}
 	});
 

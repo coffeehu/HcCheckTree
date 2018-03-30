@@ -1,54 +1,9 @@
 /*
 	hucong 2018-02-14
 	带勾选框的树形目录
-
+	
+	默认仅渲染第一级 html 结构，后面按需渲染
 	默认全部折叠，未选中。默认显示勾选框。
-
-	data 的数据结构如：
-	var data = [
-		{
-			name:'行政部'
-		},
-		{
-			name:'技术部',
-			expanded:true,  // 为true表示展开，默认折叠
-			children:[
-				{
-					name:'前端开发',
-					checked:true // 为true表示选中，默认不选中
-								 // 注意：只有该条目处于展开状态(即可见)时，选中才会有效
-				},
-				{
-					name:'后台开发'
-				}
-			]
-		}
-	];
-
-	var hcTree = new Hctree({
-		id:'tree-container',  //容器元素的id
-		data:data,  // 数据结构见上
-		//checkbox:false,  // false可关闭勾选框
-		clickFn:function(event,label){  // 点击目录名的回调
-			console.log('click',label);
-		},
-		checkFn:function(params){   // 选中勾选框的回调
-			console.log('check it!',params)
-		}
-	});
-
-	hcTree.collapseAll(); // 全部折叠
-	hcTree.expandAll(); //全部展开
-	hcTree.checkAll(); //全部选中
-	hcTree.cancelAll(); //全部取消
-	hcTree.getChecks(); //获取当前选中的所有条目集合
-	hcTree.addChild(li,name); //给li添加子条目，条目名为name
-	hcTree.remove(li); //移除该li
-*/
-
-
-/*
-	该版本初始仅渲染第一级 html 结构，后面按需渲染
 */
 (function(exports){
 
@@ -474,9 +429,9 @@ Hctree.prototype._createHTML = function(container,data,checked){
 		}
 
 		// 右图标（option中设置的，全局，优先级小于单独设置的）
-		var riconHtml = this.ricon? '<img class="hc-ricon" src="'+this.ricon+'">' : '';
+		var riconHtml = '';
 		if(typeof this.ricon === 'string'){
-			iconHtml = this.ricon? '<img class="hc-ricon" src="'+this.icon+'">' : '';
+			riconHtml = this.ricon? '<img class="hc-ricon" src="'+this.ricon+'">' : '';
 		}else if(Array.isArray(this.ricon)){
 			riconHtml = this.ricon[node.zIndex]? '<img class="hc-ricon" src="'+this.ricon[node.zIndex]+'">' : '';
 		}
@@ -540,7 +495,7 @@ Hctree.prototype._initEvents = function(){
 		else if( domUtil.hasClass(target,'hc-label') ){
 			var li = domUtil.getLi(target);
 			if(li !== null){
-				self.clickFn(event,li.hcData);
+				self.clickFn(li.hcData);
 			}
 		}
 
