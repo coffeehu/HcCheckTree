@@ -25,11 +25,16 @@ ul.hc-checktree div.hc-arrow,
 ul.hc-checktree img.hc-icon,
 ul.hc-checktree img.hc-ricon{
 	display: inline-block;
-	width: 14px;
-	height: 14px;
+	width: 18px;
+	height: 18px;
 	margin-right: 4px;
 	vertical-align: middle;
 	cursor: pointer;
+	-moz-user-select:none;/*火狐*/
+	-webkit-user-select:none;/*webkit浏览器*/
+	-ms-user-select:none;/*IE10*/
+	-khtml-user-select:none;/*早期浏览器*/
+	user-select:none;
 }
 ul.hc-checktree img.hc-icon,
 ul.hc-checktree img.hc-ricon{
@@ -39,46 +44,45 @@ ul.hc-checktree img.hc-ricon{
 	margin-right: 0;
 	margin-left: 4px;
 }
+ul.hc-checktree div.hc-collapsed,
+ul.hc-checktree div.hc-expanded,
+ul.hc-checktree div.hc-checkbox,
+ul.hc-checktree div.hc-checked,
+ul.hc-checktree div.hc-checked-half{
+	/*background:url('../imgs/checktree_icon.png');*/
+	background:url('../imgs/hctree-icon2.png') no-repeat;
+}
+
 /*------按钮-------*/
 ul.hc-checktree div.hc-arrow{
 	cursor: auto;
 }
 /*按钮：折叠*/
-ul.hc-checktree div.hc-collapsed{
-	background:url('../imgs/checktree_icon.png');
-	background-position: 0px -22px;
+ul.hc-checktree div.hc-collapsed{	
+	background-position: 1px -2px;
 	cursor: pointer;
 }
 /*按钮：展开*/
 ul.hc-checktree div.hc-expanded{
-	background:url('../imgs/checktree_icon.png');
-	background-position: -14px -22px;
+	background-position: 1px -21px;
 	cursor: pointer;
 }
 /*-------选择框---------*/
 ul.hc-checktree div.hc-checkbox{
-	background:url('../imgs/checktree_icon.png');
-	background-position: 0 -4px;
+	background-position: 0 -39px;
 }
 /*选择框：选中*/
 ul.hc-checktree div.hc-checked{
-	background:url('../imgs/checktree_icon.png');
-	background-position: 32px -4px;
+	background-position: 0px -58px;
 }
 /*选择框：半选中*/
 ul.hc-checktree div.hc-checked-half{
-	background:url('../imgs/checktree_icon.png');
-	background-position: 15px -4px;
+	background-position: 0px -77px;
 }
 /*------名称-------*/
 ul.hc-checktree label.hc-label{
 	display: inline-block;
 	vertical-align: middle;
-	-moz-user-select:none;/*火狐*/
-	-webkit-user-select:none;/*webkit浏览器*/
-	-ms-user-select:none;/*IE10*/
-	-khtml-user-select:none;/*早期浏览器*/
-	user-select:none;
 	cursor: pointer;
 }
 /*#############显示与隐藏#############*/

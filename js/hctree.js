@@ -41,7 +41,7 @@
 	hcTree.expandAll(); //全部展开
 	hcTree.checkAll(); //全部选中
 	hcTree.cancelAll(); //全部取消
-	hcTree.getAllChecks(); //获取当前选中的所有条目集合
+	hcTree.getChecks(); //获取当前选中的所有条目集合
 	hcTree.addChild(li,name); //给li添加子条目，条目名为name
 	hcTree.remove(li); //移除该li
 */
@@ -475,6 +475,11 @@ Hctree.prototype._createHTML = function(container,data,checked){
 
 		// 右图标（option中设置的，全局，优先级小于单独设置的）
 		var riconHtml = this.ricon? '<img class="hc-ricon" src="'+this.ricon+'">' : '';
+		if(typeof this.ricon === 'string'){
+			iconHtml = this.ricon? '<img class="hc-ricon" src="'+this.icon+'">' : '';
+		}else if(Array.isArray(this.ricon)){
+			riconHtml = this.ricon[node.zIndex]? '<img class="hc-ricon" src="'+this.ricon[node.zIndex]+'">' : '';
+		}
 		if(node.ricon !== undefined){
 			riconHtml = node.ricon ? '<img class="hc-ricon" src="'+node.ricon+'">' : '';
 		}
@@ -702,34 +707,25 @@ Hctree.prototype._initEnds = function(){
 	}
 }
 
-// 获得当前选中的集合，数组形式
-Hctree.prototype.getAllChecks = function(){
+// 获得当前选中的集合
+Hctree.prototype.getChecks = function(){
 	var collection = [];
-	createCheckObj(this.root,collection);
+	createCheckObj(this.data,collection);
 
-	function createCheckObj(ul,collection){
-		var liList = domUtil.children(ul,'li');
-		for(var i=0;i<liList.length;i++){
-			var li = liList[i];
-			var checkbox = domUtil.children(li)[1];
-			var className = checkbox.className;
-
-			if( domUtil.hasClass(checkbox,'hc-checked-half') ){ //半选状态
-				var name = domUtil.children(li)[2].textContent;
-				//var obj = { name:name };
-				var obj = li.hcData;
-				var childUl = domUtil.children(li,'ul')[0];
-				if(childUl){
-					obj[cName] = [];
-					createCheckObj(childUl,obj[cName]);
+	function createCheckObj(data,collection){
+		for(var i=0,l=data.length;i<l;i++){
+			var node = data[i];
+			if(node.checked){
+				collection.push(node);
+				if(node[cName] && node[cName].length>0){
+					var tmp = node[cName];
+					node[cName] = [];
+					createCheckObj(tmp,node[cName]);
 				}
-				collection.push(obj);
-			}
-			if( domUtil.hasClass(checkbox,'hc-checked') ){ //选中
-				collection.push(li.hcData);
 			}
 		}
 	}
+
 	return collection;
 }
 //全选
@@ -908,6 +904,8 @@ Hctree.prototype.setData = function(data){
 	this._preCheckedArr = [];
 	this.container.innerHTML = '';
 	this._createHTML(this.container,this.data);
+	//必须要重新设置 this.root，否则 this.root 依旧指向老的 HTMLElement！
+	this.root = domUtil.children(this.container)[0]; 
 	this._initEnds(); // 一些收尾的操作，如若是设置了expanded:true则展开对应dom
 }
 
