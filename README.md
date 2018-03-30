@@ -240,3 +240,103 @@ icon/ricon、childIcon/childRicon 的值为 false 时，关闭该层/该层的�
 }
 ```
 ![image](https://github.com/coffeehu/hctree/blob/master/tmp/falseicon.png)
+
+
+
+
+
+# 事件
+- clickFn：名称的点击事件
+- checkFn：勾选的点击事件
+- iconClickFn：左图标的点击事件
+- riconClickFn：右图标的点击事件
+
+```
+var hcTree = new Hctree({
+	id:'mtree',
+	data:data,
+	icon:'./imgs/folder.png',
+	ricon:'./imgs/heart.png',
+	clickFn:function(params){
+		console.log('click',params);
+	},
+	checkFn:function(params){
+		console.log('check it!',params)
+	},
+	iconClickFn:function(params){
+		console.log('click icon!',params);
+	},
+	riconClickFn:function(params){
+		console.log('click right icon!',params);
+	}
+});
+```
+
+参数 params 为一个对象，包含该层的各种信息。
+
+
+# 数据操作
+
+### 1、根据数据重新渲染：setData()
+```
+var data2 = [
+    {
+    	name:'苹果',
+    	children:[{name:'红富士'},{name:'冰糖心'}]
+    },
+    {name:'梨子'}
+];
+
+hcTree.setData(data2);
+```
+
+### 2、深复制
+为了防止影响源数据，hctree 默认是深复制一份源数据的。  
+若想关闭复制，可以使用 deep:false
+```
+var hcTree = new Hctree({
+    id:'mtree',
+    data:data,
+    deep:false // add this!
+})
+```
+
+### 3、adapter
+默认数据格式：
+- 名称字段名："name"
+- 子层级字段名: "children"
+
+当源数据的字段名不符合时，可以使用 adapter：
+- name：指定名称的字段名
+- cName: 指定子层级的字段名
+
+```
+var data2 = [
+    {
+        label:'苹果',
+        list:[{label:'红富士'},{label:'冰糖心'}]
+    },
+    {label:'梨子'}
+];
+var hcTree = new Hctree({
+    id:'mtree',
+    data:data,
+    name:'label',
+    cName:'list'
+})
+```
+
+# 结构操作
+
+### 1、添加一条子层级：addChild()
+addChild(li,name)
+- li：指定层的dom元素，是一个<li>元素
+- name：要添加的子层的名称
+
+### 2、删除当前层：remove()
+remove(li)
+- li：当前层的 <li> 元素
+
+
+
+#
