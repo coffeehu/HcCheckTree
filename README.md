@@ -80,7 +80,7 @@ var hcTree = new Hctree({
         	name:'肉类'
         }
     ]
-    }
+}
 ```
 ![image](https://github.com/coffeehu/hctree/blob/master/tmp/expand.png)
 
@@ -161,3 +161,82 @@ var hcTree = new Hctree({
 ```
 ![image](https://github.com/coffeehu/hctree/blob/master/tmp/checkboxfalse.png)
 
+
+
+
+# 图标
+### 1、左图标：icon
+```
+var hcTree = new Hctree({
+	id:'mtree',
+	data:data,
+	icon:'./imgs/folder.png'
+});
+```
+![image](https://github.com/coffeehu/hctree/blob/master/tmp/icon.png)
+
+### 2、右图标：ricon
+```
+var hcTree = new Hctree({
+	id:'mtree',
+	data:data,
+	icon:'./imgs/folder.png',
+	ricon:'./imgs/heart.png'
+});
+```
+![image](https://github.com/coffeehu/hctree/blob/master/tmp/ricon.png)
+
+### 3、分层图标
+若是层级确定，icon 还可以是一个数组：
+```
+{
+    icon:['./imgs/folder.png','./imgs/star.png','./imgs/asterisk.png']
+}
+```
+**代表：[ '第一层的icon地址', '第二层的icon地址', 第三层的icon地址 ]**
+
+![image](https://github.com/coffeehu/hctree/blob/master/tmp/arricon.png)
+
+同理，ricon 用法一样。
+
+### 4、数据中的 icon/ricon，childIcon/childRicon （优先级更高）
+- icon: 该层的左图标
+- childIcon：该层的后代层级的左图标
+- ricon、childRicon 同理
+
+```
+{
+	name:'面食',
+	icon:'./imgs/heart.png',
+	childIcon:'./imgs/asterisk.png',
+	children:[
+        {
+            name:'豚骨拉面',
+        },
+        {
+            name:'牛肉米粉'
+        }
+	]
+}
+```
+![image](https://github.com/coffeehu/hctree/blob/master/tmp/cicon.png)
+
+### 5、关闭图标
+icon/ricon、childIcon/childRicon 的值为 false 时，关闭该层/该层的后代层 的图标。
+
+```
+{
+    name:'面食',
+    icon:false,
+    childIcon:false,
+    children:[
+        {
+            name:'豚骨拉面',
+        },
+        {
+            name:'牛肉米粉'
+        }
+    ]
+}
+```
+![image](https://github.com/coffeehu/hctree/blob/master/tmp/falseicon.png)
