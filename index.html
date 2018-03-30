@@ -75,7 +75,7 @@
 			</div>
 			<div class="btns-row clearfix">
 				<div><input type="radio" name="check" id="checkedAll"><label>全选</label></div>
-				<div><input type="radio" name="check" id="cancelAll"><label>取消</label></div>
+				<div><input type="radio" name="check" id="cancelAll"><label>取消全选</label></div>
 			</div>
 			<div class="btns-row clearfix">
 				<div><input type="radio" name="data" id="changeData"><label>改变数据</label></div>
@@ -130,6 +130,7 @@
 	var hcTree = new Hctree({
 		id:'mtree',
 		data:data,
+		icon:'./imgs/folder.png',
 		clickFn:function(params){
 			console.log('click',params);
 		},
