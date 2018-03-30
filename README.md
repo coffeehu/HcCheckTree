@@ -8,7 +8,9 @@
 
 ### 2、html 引入 hctree.js;
 ```
-<script src="./lib/hctree/js/hctree.js"></script>
+<head>
+	<script src="./lib/hctree/js/hctree.js"></script>
+</head>
 
 <body>
     <div id="mtree"></div>
@@ -210,12 +212,12 @@ var hcTree = new Hctree({
 	icon:'./imgs/heart.png',
 	childIcon:'./imgs/asterisk.png',
 	children:[
-        {
-            name:'豚骨拉面',
-        },
-        {
-            name:'牛肉米粉'
-        }
+		{
+		    name:'豚骨拉面',
+		},
+		{
+		    name:'牛肉米粉'
+		}
 	]
 }
 ```
@@ -330,12 +332,12 @@ var hcTree = new Hctree({
 
 ### 1、添加一条子层级：addChild()
 addChild(li,name)
-- li：指定层的dom元素，是一个<li>元素
+- li：指定层的dom元素，是一个\<li\>元素
 - name：要添加的子层的名称
 
 ### 2、删除当前层：remove()
 remove(li)
-- li：当前层的 <li> 元素
+- li：当前层的 \<li\> 元素
 
 
 
