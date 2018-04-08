@@ -538,7 +538,7 @@ Hctree.prototype._initEvents = function(){
 //获取叶子节点
 Hctree.prototype._getLeafChildren = function(data){
 	var matched = [];
-	if(data[cName]){
+	if(data[cName]&&data[cName].length>0){
 		for(var i=0,l=data[cName].length;i<l;i++){
 			var node = data[cName][i];
 			matched = matched.concat( this._getLeafChildren(node) );
@@ -688,7 +688,6 @@ Hctree.prototype._expandLi = function(li,arrow){
 		domUtil.removeClass(ul,'hc-hide');
 	}else{ //未渲染过，需根据数据生成dom
 		if(li.hcData[cName] && li.hcData[cName].length>0){
-			console.log(li,li.hcData[cName])
 			this._createHTML(li,li.hcData[cName],li.hcData.checked);
 			li.isUpdated = true;
 		}
@@ -743,6 +742,13 @@ Hctree.prototype.checkAll = function(){
 		var li = domUtil.getLi(checkboxes[i]);
 		li.hcData.checked = true;
 	}
+
+	//this.leafChecks数组的处理，应该加入所有叶子节点数据
+	this.leafChecks = [];
+	for(var i=0,l=this.data.length;i<l;i++){
+		this._checkboxLinkDownTrue(this.data[i],true);
+		this.leafChecks = this.leafChecks.concat( this._getLeafChildren(this.data[i]) );
+	}
 }
 //取消全部
 Hctree.prototype.cancelAll = function(){
@@ -752,6 +758,9 @@ Hctree.prototype.cancelAll = function(){
 		var li = domUtil.getLi(checkboxes[i]);
 		li.hcData.checked = false;
 	}
+
+	//this.leafChecks数组的处理，直接清空
+	this.leafChecks = [];
 }
 // 展开全部
 Hctree.prototype.expandAll = function(){
