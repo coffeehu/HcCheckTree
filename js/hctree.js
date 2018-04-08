@@ -184,6 +184,7 @@ domUtil.addcss();
 var Hctree = exports.Hctree = function(option){
 	if(typeof option !== 'object') return;
 	option = option || {};
+	this.leafChecks = [];
 	
 	this._initOption(option);
 	this._initData(option.data);
@@ -279,6 +280,7 @@ Hctree.prototype._initData = function(data){
 			item.expanded = true;
 		}
 	}
+
 
 	/*
 		深复制源数据
@@ -465,9 +467,9 @@ Hctree.prototype._initEvents = function(){
 		if(domUtil.hasClass(target,'hc-arrow')){
 			var li = domUtil.getLi(target);
 			if(li !== null){
-				if(domUtil.hasClass(target,'hc-collapsed')){ //收起的，应置为展开
+				if(domUtil.hasClass(target,'hc-collapsed')){ //置为展开
 					self._expandLi(li,target);
-				}else if(domUtil.hasClass(target,'hc-expanded')){ // 展开的，应收起
+				}else if(domUtil.hasClass(target,'hc-expanded')){ // 收起
 					self._collapseLi(li,target);
 				}
 			}
@@ -477,15 +479,30 @@ Hctree.prototype._initEvents = function(){
 		else if( domUtil.hasClass(target,'hc-checkbox') ){
 			var li = domUtil.getLi(target);
 			if(li !== null){
-				if( domUtil.hasClass(target,'hc-checked') || domUtil.hasClass(target,'hc-checked-half') ){ // 选中的，应置为未选中
+				if( domUtil.hasClass(target,'hc-checked') || domUtil.hasClass(target,'hc-checked-half') ){ //置为未选中
 					li.hcData.checked = false;
 					domUtil.removeClass(target,'hc-checked hc-checked-half');
 					self._checkboxLink(target,false);
-				}else{ //未选中，应置为选中
+
+					// 从 leafChecks 数组中移除
+					var result = self._getLeafChildren(li.hcData);
+					for(var i=0,l=result.length;i<l;i++){
+						var target = result[i];
+						for(var j=self.leafChecks.length-1;j>=0;j--){
+							if(target === self.leafChecks[j]){
+								self.leafChecks.splice(j,1);
+								break;
+							}
+						}
+					}
+				}else{ //置为选中
 					li.hcData.checked = true;
 					domUtil.removeClass(target,'hc-checked-half');
 					domUtil.addClass(target,'hc-checked');
 					self._checkboxLink(target,true);
+
+					// 选中的加入 leafChecks 数组
+					self.leafChecks = self.leafChecks.concat( self._getLeafChildren(li.hcData) );
 				}
 				self.checkFn(li.hcData);
 			}
@@ -518,11 +535,31 @@ Hctree.prototype._initEvents = function(){
 		return false;
 	}
 }
+//获取叶子节点
+Hctree.prototype._getLeafChildren = function(data){
+	var matched = [];
+	if(data[cName]){
+		for(var i=0,l=data[cName].length;i<l;i++){
+			var node = data[cName][i];
+			matched = matched.concat( this._getLeafChildren(node) );
+		}
+	}else{ //没有children，本身为叶子节点
+		matched.push(data);
+	}
+	return matched;
+}
 //选中选择框后，其子选择框、父选择框的联动响应
 // check: true-选中，false-取消
 // target:checkbox元素
 Hctree.prototype._checkboxLink = function(target,check){
+	//对子节点的联动
 	this._checkboxLinkDown(target,check);
+
+	//为当前节点的所有子节点设置checked:false/true
+	var data = domUtil.getLi(target).hcData;
+	this._checkboxLinkDownTrue(data,check);
+
+	//对父节点的联动
 	this._checkboxLinkUp(target);
 }
 //对其子选择框的联动
@@ -550,10 +587,19 @@ Hctree.prototype._checkboxLinkDown = function(target,check){
 		//传入子 checkbox 递归
 		this._checkboxLinkDown(childrenCheckbox,check);
 	}
-	//数据处理
-	if(li.hcData[cName] && li.hcData[cName].length>0){
-		for(var j=0,len=li.hcData[cName].length;j<len;j++){
-			li.hcData[cName][j].checked = check;
+}
+/*
+	数据处理，data 所有 children 的 checked 字段置为 true/false
+*/
+Hctree.prototype._checkboxLinkDownTrue = function(data,check){
+	var that = this;
+	if(data[cName] && data[cName].length>0){
+		for(var i=0,l=data[cName].length;i<l;i++){
+			var item = data[cName][i];
+			item.checked = check;
+			if(item[cName] && item[cName].length>0){
+				that._checkboxLinkDownTrue(item,check);
+			}
 		}
 	}
 }
@@ -642,6 +688,7 @@ Hctree.prototype._expandLi = function(li,arrow){
 		domUtil.removeClass(ul,'hc-hide');
 	}else{ //未渲染过，需根据数据生成dom
 		if(li.hcData[cName] && li.hcData[cName].length>0){
+			console.log(li,li.hcData[cName])
 			this._createHTML(li,li.hcData[cName],li.hcData.checked);
 			li.isUpdated = true;
 		}
@@ -682,6 +729,10 @@ Hctree.prototype.getChecks = function(){
 	}
 
 	return collection;
+}
+// 获得当前选中的集合：数组形式，成员时所有选中的叶子节点数据
+Hctree.prototype.getLeafChecks = function(){
+	return this.leafChecks;
 }
 //全选
 Hctree.prototype.checkAll = function(){

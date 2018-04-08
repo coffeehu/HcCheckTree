@@ -82,7 +82,8 @@
 				<div><input type="radio" name="data" id="resetData"><label>恢复</label></div>
 			</div>
 			<div class="btns-row clearfix">
-				<div><button id="getChecked">获得选中</button></div>
+				<div><button id="getChecked">获得选中1</button></div>
+				<div><button id="getLeafChecked">获得选中2</button></div>
 			</div>
 		</div>	
 	</div>
@@ -182,6 +183,11 @@
 		else if(id === 'getChecked'){
 			var result = hcTree.getChecks();
 			console.log('getChecked result',result);
+		}
+		//获得选中-叶子节点
+		else if(id === 'getLeafChecked'){
+			var result = hcTree.getLeafChecks();
+			console.log('getLeafChecked result',result);
 		}
 	}
 
