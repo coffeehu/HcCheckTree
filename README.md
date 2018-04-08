@@ -140,11 +140,18 @@ hcTree.checkAll();
 hcTree.cancelAll();
 ```
 
-### 4、获得勾选的值：getChecks()
+### 4、获得勾选的值
+#### getChecks()
 ```
 var result = hcTree.getChecks();
 ```
-返回的是一个数组。
+返回的是一个数组，成员包含父节点数据。
+
+#### getLeafChecks()
+```
+var result = hcTree.getLeafChecks();
+```
+返回的是一个数组，成员是所有被选中的叶子节点的数据。
 
 ### 5、状态
 视觉上有三个状态：未勾选、勾选、半选（指子层级部分勾选）。  
