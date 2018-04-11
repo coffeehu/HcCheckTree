@@ -134,13 +134,13 @@ hcTree.collapseAll();
 ```
 hcTree.check(li);
 ```
-参数 li 是目标节点元素，为 <li> 元素
+参数 li 是目标节点元素，为 \<li\> 元素
 
 ### 3、取消选中：cancel()
 ```
 hcTree.cancel(li);
 ```
-参数 li 是目标节点元素，为 <li> 元素
+参数 li 是目标节点元素，为 \<li\> 元素
 	
 ### 4、全选：checkAll()
 ```
