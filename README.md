@@ -130,17 +130,29 @@ hcTree.collapseAll();
 
 ![image](https://github.com/coffeehu/hctree/blob/master/tmp/check.png)
 
-### 2、全选：checkAll()
+### 2、选中：check()
+```
+hcTree.check(li);
+```
+参数 li 是目标节点元素，为 <li> 元素
+
+### 3、取消选中：cancel()
+```
+hcTree.cancel(li);
+```
+参数 li 是目标节点元素，为 <li> 元素
+	
+### 4、全选：checkAll()
 ```
 hcTree.checkAll();
 ```
 
-### 3、取消全选：cancelAll()
+### 5、取消全选：cancelAll()
 ```
 hcTree.cancelAll();
 ```
 
-### 4、获得勾选的值
+### 6、获得勾选的值
 #### getChecks()
 ```
 var result = hcTree.getChecks();
@@ -153,14 +165,14 @@ var result = hcTree.getLeafChecks();
 ```
 返回的是一个数组，成员是所有被选中的叶子节点的数据。
 
-### 5、状态
+### 7、状态
 视觉上有三个状态：未勾选、勾选、半选（指子层级部分勾选）。  
 
 数据上只有两个状态：
 - 未勾选，checked:false
 - 勾选/半选，checked:true
 
-### 6、关闭勾选框 checkbox:false
+### 8、关闭勾选框 checkbox:false
 ```
 var hcTree = new Hctree({
 	id:'mtree',
