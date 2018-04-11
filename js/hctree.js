@@ -714,14 +714,19 @@ Hctree.prototype.getChecks = function(){
 	createCheckObj(this.data,collection);
 
 	function createCheckObj(data,collection){
+		var key;
 		for(var i=0,l=data.length;i<l;i++){
-			var node = data[i];
-			if(node.checked){
-				collection.push(node);
-				if(node[cName] && node[cName].length>0){
+			//浅复制一份
+			var node = {};
+			for(key in data[i]){
+				node[key] = data[i][key];
+			}
+			if(node.checked){ //如果是选中
+				collection.push(node); //加入集合
+				if(node[cName] && node[cName].length>0){ //如果有子节点
 					var tmp = node[cName];
 					node[cName] = [];
-					createCheckObj(tmp,node[cName]);
+					createCheckObj(tmp,node[cName]); //目的是选中的子节点才会加入子节点集合
 				}
 			}
 		}
@@ -732,6 +737,38 @@ Hctree.prototype.getChecks = function(){
 // 获得当前选中的集合：数组形式，成员时所有选中的叶子节点数据
 Hctree.prototype.getLeafChecks = function(){
 	return this.leafChecks;
+}
+//选中一个
+Hctree.prototype.check = function(li){
+	li.hcData.checked = true;
+	var checkbox = domUtil.getCheckboxByLi(li);
+
+	domUtil.removeClass(checkbox,'hc-checked-half');
+	domUtil.addClass(checkbox,'hc-checked');
+	this._checkboxLink(checkbox,true);
+
+	// 选中的加入 leafChecks 数组
+	this.leafChecks = this.leafChecks.concat( this._getLeafChildren(li.hcData) );
+}
+//取消选中一个
+Hctree.prototype.cancel = function(li){
+	li.hcData.checked = false;
+	var checkbox = domUtil.getCheckboxByLi(li);
+
+	domUtil.removeClass(checkbox,'hc-checked hc-checked-half');
+	this._checkboxLink(checkbox,false);
+
+	// 从 leafChecks 数组中移除
+	var result = this._getLeafChildren(li.hcData);
+	for(var i=0,l=result.length;i<l;i++){
+		var target = result[i];
+		for(var j=this.leafChecks.length-1;j>=0;j--){
+			if(target === this.leafChecks[j]){
+				this.leafChecks.splice(j,1);
+				break;
+			}
+		}
+	}
 }
 //全选
 Hctree.prototype.checkAll = function(){
