@@ -7,10 +7,11 @@
 ### 1、项目结构下直接加入 hctree 目录; 
 ![image](https://github.com/coffeehu/hctree/blob/master/tmp/mulu.png)
 
-### 2、html 引入 hctree.js;
+### 2、html 引入 hc.css和hctree.js;
 ```
 <head>
-	<script src="./lib/hctree/js/hctree.js"></script>
+  <link rel="stylesheet" type="text/css" href="./css/hctree.css">
+  <script src="./lib/hctree/js/hctree.js"></script>
 </head>
 
 <body>
