@@ -179,7 +179,7 @@ var domUtil = {
 	}
 };
 
-domUtil.addcss();
+//domUtil.addcss();
 
 var Hctree = exports.Hctree = function(option){
 	if(typeof option !== 'object') return;
